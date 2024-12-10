@@ -72,9 +72,10 @@ const Navbar = () => {
       {/* NAVIGATION */}
       <nav className="hidden sm:ml-6 sm:flex flex-grow justify-center items-center">
         <NavLink href="/shop">Shop</NavLink>
-        <NavLink href="/admin-dashboard">Admin</NavLink>
-        <NavLink href="/customer-dashboard">Customer</NavLink>
-        <NavLink href="/demo">Demo</NavLink>
+        <NavLink href="/blog">Blog</NavLink>
+        {/* <NavLink href="/admin-dashboard">Admin</NavLink> */}
+        {/* <NavLink href="/customer-dashboard">Customer</NavLink> */}
+        {/* <NavLink href="/demo">Demo</NavLink> */}
         <NavLink href="/template">Template</NavLink>
       </nav>
 
