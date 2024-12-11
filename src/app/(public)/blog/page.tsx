@@ -1,7 +1,8 @@
 import BlogPageContent from "./BlogPageContent";
+import BlogPageContentTest from "./BlogPageContentTest";
 
 const CartPage = () => {
-  return <BlogPageContent />;
+  return <BlogPageContentTest />;
 };
 
 export default CartPage;
