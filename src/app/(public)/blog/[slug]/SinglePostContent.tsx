@@ -3,18 +3,13 @@ import styles from "./Single.module.scss";
 import Row from "@/components/common/Row";
 import Page from "@/components/common/Page";
 import Head from "next/head";
-import { fetchSinglePostBySlug } from "@/services/blogServices";
 import { notFound } from "next/navigation";
-import NotFoundPage from "../not-found";
+import { BlogPost } from "@/types/blog";
 
-const SinglePostContent = async ({ params }: { params: { slug: string } }) => {
-  console.log("Slug [SinglePostContent]:", params);
-  const { slug } = params;
-
-  // Fetch the single post by slug
-  const post = await fetchSinglePostBySlug(slug);
-  // console.log("Single Post [SinglePostContent]", post);
-
+interface Props {
+  post: BlogPost;
+}
+const SinglePostContent = async ({ post }: Props) => {
   // If no post is found, show a 404 page
   if (!post) {
     notFound();
@@ -23,7 +18,7 @@ const SinglePostContent = async ({ params }: { params: { slug: string } }) => {
   return (
     <>
       <Head>
-        <title>{post.title.rendered}</title>
+        <title>{post.title}</title>
         <meta name="description" content={`Post: ${post.title}`} />
       </Head>
       <Page className={""} FULL={false}>

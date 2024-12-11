@@ -23,3 +23,7 @@ export interface BlogPost {
     };
   };
 }
+
+export interface PostSlug {
+  slug: string;
+}

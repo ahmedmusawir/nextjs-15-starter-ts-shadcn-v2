@@ -76,6 +76,9 @@ export async function GET(request: Request) {
         query: GRAPHQL_QUERY,
         variables: { slug },
       }),
+      next: {
+        revalidate: 60, // Revalidate the cached data every 60 seconds
+      },
     });
 
     const data = await response.json();

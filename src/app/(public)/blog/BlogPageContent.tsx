@@ -1,6 +1,9 @@
 import BlogPostItems from "@/components/blog/BlogPostItems";
 import LoadMoreButton from "@/components/common/LoadMoreButton";
-import { fetchBlogPosts } from "@/services/blogServices";
+import {
+  fetchAllPostSlugsDirect,
+  fetchBlogPosts,
+} from "@/services/blogServices";
 import { usePaginationStore } from "@/store/usePaginationStore";
 import Link from "next/link";
 
@@ -17,6 +20,9 @@ const BlogPageContent = async () => {
     endCursor,
     hasNextPage,
   });
+
+  const slugs = await fetchAllPostSlugsDirect();
+  console.log("SLUGS [BlogPageConent.tsx]", slugs);
 
   return (
     <div className="bg-white py-24 sm:py-32">
