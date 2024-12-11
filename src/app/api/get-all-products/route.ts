@@ -24,30 +24,8 @@
 
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-
-  // Extract query parameters
-  const first = parseInt(searchParams.get("first") || "0", 10);
-  const after = searchParams.get("after") || null;
-
-  if (!first || first <= 0) {
-    return NextResponse.json(
-      { error: 'Invalid "first" parameter. Must be a positive integer.' },
-      { status: 400 }
-    );
-  }
-
-  try {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_WORDPRESS_API_URL || "",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: `
+const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL!;
+const GRAPHQL_QUERY = `
           query GetProductsWithPagination($first: Int!, $after: String) {
             products(first: $first, after: $after) {
               pageInfo {
@@ -84,11 +62,33 @@ export async function GET(request: Request) {
               }
             }
           }
-        `,
-          variables: { first, after },
-        }),
-      }
+        `;
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+
+  // Extract query parameters
+  const first = parseInt(searchParams.get("first") || "0", 10);
+  const after = searchParams.get("after") || null;
+
+  if (!first || first <= 0) {
+    return NextResponse.json(
+      { error: 'Invalid "first" parameter. Must be a positive integer.' },
+      { status: 400 }
     );
+  }
+
+  try {
+    const response = await fetch(WORDPRESS_API_URL || "", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: GRAPHQL_QUERY,
+        variables: { first, after },
+      }),
+    });
 
     const data = await response.json();
 

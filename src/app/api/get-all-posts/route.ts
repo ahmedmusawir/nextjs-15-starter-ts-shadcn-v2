@@ -93,6 +93,9 @@ export async function GET(request: Request) {
         query: GRAPHQL_QUERY,
         variables: { first, after },
       }),
+      next: {
+        revalidate: 60, // Revalidate the cached data every 60 seconds
+      },
     });
 
     if (!response.ok) {

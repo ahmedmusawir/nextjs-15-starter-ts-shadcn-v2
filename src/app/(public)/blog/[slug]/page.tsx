@@ -1,7 +1,7 @@
 import SinglePostContent from "./SinglePostContent";
 
-const CartPage = () => {
-  return <SinglePostContent />;
+const SinglePost = ({ params }: { params: { slug: string } }) => {
+  return <SinglePostContent params={params} />;
 };
 
-export default CartPage;
+export default SinglePost;

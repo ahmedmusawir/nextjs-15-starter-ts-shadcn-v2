@@ -24,29 +24,8 @@
 
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-
-  // Extract query parameters
-  const slug = searchParams.get("slug");
-
-  if (!slug) {
-    return NextResponse.json(
-      { error: 'The "slug" parameter is required.' },
-      { status: 400 }
-    );
-  }
-
-  try {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_WORDPRESS_API_URL || "",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: `
+const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL!;
+const GRAPHQL_QUERY = `
           query GetSinglePostBySlug($slug: ID!) {
             post(id: $slug, idType: SLUG) {
               id
@@ -72,11 +51,32 @@ export async function GET(request: Request) {
               }
             }
           }
-        `,
-          variables: { slug },
-        }),
-      }
+        `;
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+
+  // Extract query parameters
+  const slug = searchParams.get("slug");
+
+  if (!slug) {
+    return NextResponse.json(
+      { error: 'The "slug" parameter is required.' },
+      { status: 400 }
     );
+  }
+
+  try {
+    const response = await fetch(WORDPRESS_API_URL || "", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: GRAPHQL_QUERY,
+        variables: { slug },
+      }),
+    });
 
     const data = await response.json();
 

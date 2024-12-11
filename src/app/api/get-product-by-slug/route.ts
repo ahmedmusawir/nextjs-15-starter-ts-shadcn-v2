@@ -31,18 +31,8 @@
 
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const slug = searchParams.get("slug");
-
-  if (!slug) {
-    return NextResponse.json(
-      { error: "Product slug is required as a query parameter." },
-      { status: 400 }
-    );
-  }
-
-  const query = `
+const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL!;
+const GRAPHQL_QUERY = `
     query GetSingleProductBySlug($slug: ID!) {
       product(id: $slug, idType: SLUG) {
         id
@@ -76,19 +66,28 @@ export async function GET(request: Request) {
     }
   `;
 
-  const variables = { slug };
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const slug = searchParams.get("slug");
+
+  if (!slug) {
+    return NextResponse.json(
+      { error: "Product slug is required as a query parameter." },
+      { status: 400 }
+    );
+  }
 
   try {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_WORDPRESS_API_URL as string,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query, variables }),
-      }
-    );
+    const response = await fetch(WORDPRESS_API_URL as string, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: GRAPHQL_QUERY,
+        variables: { slug },
+      }),
+    });
 
     if (!response.ok) {
       throw new Error(
