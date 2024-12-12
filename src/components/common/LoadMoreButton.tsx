@@ -26,14 +26,10 @@ import { Button } from "../ui/button";
 import Spinner from "./Spinner";
 
 interface LoadMoreButtonProps {
-  endpoint: string;
   initialEndCursor: string | null;
 }
 
-const LoadMoreButton = ({
-  endpoint,
-  initialEndCursor,
-}: LoadMoreButtonProps) => {
+const LoadMoreButton = ({ initialEndCursor }: LoadMoreButtonProps) => {
   const { hasNextPage, fetchNextPage, isLoading } = usePaginationStore();
 
   const handleLoadMore = async () => {

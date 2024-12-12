@@ -1,18 +1,16 @@
 import BlogPostItems from "@/components/blog/BlogPostItems";
 import LoadMoreButton from "@/components/common/LoadMoreButton";
-import {
-  fetchAllPostSlugsDirect,
-  fetchBlogPosts,
-} from "@/services/blogServices";
+import { fetchBlogPosts } from "@/services/blogServices";
 import { usePaginationStore } from "@/store/usePaginationStore";
-import Link from "next/link";
+
+export const revalidate = 60; // ISR setting
 
 const BlogPageContent = async () => {
   const {
     items: initialPosts,
     endCursor,
     hasNextPage,
-  } = await fetchBlogPosts(6); // Fetch first 6 posts
+  } = await fetchBlogPosts(6, null); // Fetch first 6 posts
 
   // Initialize Zustand store with the first batch of posts
   usePaginationStore.setState({
@@ -20,9 +18,6 @@ const BlogPageContent = async () => {
     endCursor,
     hasNextPage,
   });
-
-  const slugs = await fetchAllPostSlugsDirect();
-  console.log("SLUGS [BlogPageConent.tsx]", slugs);
 
   return (
     <div className="bg-white py-24 sm:py-32">
@@ -38,12 +33,7 @@ const BlogPageContent = async () => {
         {/* Render the posts */}
         <BlogPostItems initialPosts={initialPosts} />
         {/* Pass props to LoadMoreButton */}
-        {hasNextPage && (
-          <LoadMoreButton
-            endpoint="/api/get-all-posts"
-            initialEndCursor={endCursor}
-          />
-        )}
+        {hasNextPage && <LoadMoreButton initialEndCursor={endCursor} />}
       </div>
     </div>
   );

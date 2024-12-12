@@ -1,15 +1,17 @@
 import { notFound } from "next/navigation";
 import SinglePostContent from "./SinglePostContent";
 import {
-  fetchAllPostSlugsDirect,
+  fetchAllPostSlugs,
   fetchSinglePostBySlug,
 } from "@/services/blogServices";
 
+export const revalidate = 60; // ISR setting
+
 // Generate static params for SSG
-// export async function generateStaticParams() {
-//   const slugs = await fetchAllPostSlugsDirect();
-//   return slugs.map((slug: string) => ({ slug }));
-// }
+export async function generateStaticParams() {
+  const slugs = await fetchAllPostSlugs();
+  return slugs.map((slug: string) => ({ slug }));
+}
 
 // Single post page component
 const SinglePost = async ({
@@ -18,7 +20,9 @@ const SinglePost = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const { slug } = await params;
-  const post = await fetchSinglePostBySlug(slug);
+  const data = await fetchSinglePostBySlug(slug);
+  const post = data.post;
+  console.log("Single Post [/blog/[slug]/page.tsx]", post);
 
   // Handle 404 with ISR
   if (!post) {

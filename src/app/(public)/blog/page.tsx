@@ -1,7 +1,7 @@
 import BlogPageContent from "./BlogPageContent";
 
-const CartPage = () => {
+const BlogPage = () => {
   return <BlogPageContent />;
 };
 
-export default CartPage;
+export default BlogPage;
