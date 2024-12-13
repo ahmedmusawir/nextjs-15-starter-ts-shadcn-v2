@@ -1,30 +1,5 @@
 import { create } from "zustand";
-
-/**
- * Zustand Store for Pagination
- *
- * ## Purpose
- * - Centralizes the logic for managing paginated data such as blog posts, products, or other resources.
- * - Keeps track of the current `items`, `endCursor`, and `hasNextPage` for consistent pagination handling.
- *
- * ## State Variables
- * - `items`: Array of paginated items (e.g., posts or products).
- * - `endCursor`: Tracks the cursor for fetching the next page of items.
- * - `hasNextPage`: Boolean indicating whether more pages are available.
- * - `isLoading`: Boolean to indicate if data is being loaded.
- *
- * ## Actions
- * - `fetchNextPage`: Fetches the next page of items based on the `endCursor`.
- * - `updateData`: Updates the store manually with new items, cursor, and pagination state.
- * - `resetPagination`: Resets the store to its initial state.
- *
- * ## Usage
- * - Import and use in any component requiring pagination.
- * - Example:
- *   - Fetch next page: `usePaginationStore.getState().fetchNextPage(fetchFunction);`
- *   - Update data manually: `usePaginationStore.getState().updateData(newItems, newEndCursor, newHasNextPage);`
- *   - Reset pagination: `usePaginationStore.getState().resetPagination();`
- */
+import { persist, createJSONStorage } from "zustand/middleware";
 
 interface PaginationStore<T> {
   items: T[]; // Array to store paginated items
@@ -42,48 +17,66 @@ interface PaginationStore<T> {
     newHasNextPage: boolean
   ) => void; // Action to manually update the store
   resetPagination: () => void; // Action to reset pagination state
+  setIsLoading: (loading: boolean) => void; // Action to set loading state
 }
 
-export const usePaginationStore = create<PaginationStore<any>>((set) => ({
-  items: [],
-  endCursor: null,
-  hasNextPage: true,
-  isLoading: false,
-
-  fetchNextPage: async (fetchFunction) => {
-    set({ isLoading: true });
-
-    try {
-      // Call the fetch function with the current endCursor
-      const { items, endCursor, hasNextPage } = await fetchFunction(
-        usePaginationStore.getState().endCursor
-      );
-
-      set((state) => ({
-        items: [...state.items, ...items], // Append new items to the existing list
-        endCursor,
-        hasNextPage,
-        isLoading: false,
-      }));
-    } catch (error) {
-      console.error("Error fetching next page:", error);
-      set({ isLoading: false });
-    }
-  },
-
-  updateData: (newItems, newEndCursor, newHasNextPage) => {
-    set((state) => ({
-      items: [...state.items, ...newItems], // Append new items to the existing list
-      endCursor: newEndCursor,
-      hasNextPage: newHasNextPage,
-    }));
-  },
-
-  resetPagination: () =>
-    set({
+export const usePaginationStore = create<PaginationStore<any>>()(
+  persist(
+    (set) => ({
       items: [],
       endCursor: null,
       hasNextPage: true,
-      isLoading: false,
+      isLoading: true, // Initially loading
+
+      fetchNextPage: async (fetchFunction) => {
+        set({ isLoading: true });
+
+        try {
+          const { items, endCursor, hasNextPage } = await fetchFunction(
+            usePaginationStore.getState().endCursor
+          );
+
+          set((state) => ({
+            items: [...state.items, ...items],
+            endCursor,
+            hasNextPage,
+            isLoading: false,
+          }));
+        } catch (error) {
+          console.error("Error fetching next page:", error);
+          set({ isLoading: false });
+        }
+      },
+
+      updateData: (newItems, newEndCursor, newHasNextPage) => {
+        set((state) => ({
+          items: [...state.items, ...newItems],
+          endCursor: newEndCursor,
+          hasNextPage: newHasNextPage,
+        }));
+      },
+
+      resetPagination: () =>
+        set({
+          items: [],
+          endCursor: null,
+          hasNextPage: true,
+          isLoading: false,
+        }),
+
+      setIsLoading: (loading) => set({ isLoading: loading }),
     }),
-}));
+    {
+      name: "pagination-store", // LocalStorage key
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        items: state.items,
+        endCursor: state.endCursor,
+        hasNextPage: state.hasNextPage,
+      }),
+      onRehydrateStorage: () => (state) => {
+        state?.setIsLoading(false); // Hydration is complete
+      },
+    }
+  )
+);

@@ -5,8 +5,6 @@ import {
   fetchSinglePostBySlug,
 } from "@/services/blogServices";
 
-export const revalidate = 60; // ISR setting
-
 // Generate static params for SSG
 export async function generateStaticParams() {
   const slugs = await fetchAllPostSlugs();

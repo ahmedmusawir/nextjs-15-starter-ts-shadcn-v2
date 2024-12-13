@@ -1,5 +1,3 @@
-import { NextResponse } from "next/server";
-
 const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL!;
 
 /**
@@ -107,10 +105,10 @@ export const fetchAllPostSlugs = async (): Promise<string[]> => {
   return slugs;
 };
 
+import { GRAPHQL_QUERY_GET_ALL_POSTS } from "@/graphql/queries/posts/getAllPosts";
 // ---------------- end of fetchAllPostSlugs ----------------------------------
 
 import { BlogPost } from "@/types/blog";
-// import { fetch } from "next/server";
 
 interface BlogPostsResponse {
   items: BlogPost[];
@@ -127,38 +125,7 @@ export const fetchBlogPosts = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      query: `
-        query GetBlogPosts($first: Int!, $after: String) {
-          posts(first: $first, after: $after) {
-            nodes {
-              id
-              title
-              slug
-              date
-              excerpt
-              featuredImage {
-                node {
-                  sourceUrl
-                }
-              }
-              categories {
-                nodes {
-                  name
-                }
-              }
-              author {
-                node {
-                  name
-                }
-              }
-            }
-            pageInfo {
-              hasNextPage
-              endCursor
-            }
-          }
-        }
-      `,
+      query: GRAPHQL_QUERY_GET_ALL_POSTS,
       variables: { first, after },
     }),
     next: {

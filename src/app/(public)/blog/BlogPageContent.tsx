@@ -3,20 +3,19 @@ import LoadMoreButton from "@/components/common/LoadMoreButton";
 import { fetchBlogPosts } from "@/services/blogServices";
 import { usePaginationStore } from "@/store/usePaginationStore";
 
-export const revalidate = 60; // ISR setting
-
 const BlogPageContent = async () => {
   const {
-    items: initialPosts,
+    items: initialPosts, // Simply Renaming the items var to initialPosts
     endCursor,
     hasNextPage,
   } = await fetchBlogPosts(6, null); // Fetch first 6 posts
 
   // Initialize Zustand store with the first batch of posts
   usePaginationStore.setState({
-    items: initialPosts,
+    items: initialPosts, // Assigning the initialPosts value to the items var
     endCursor,
     hasNextPage,
+    isLoading: false,
   });
 
   return (

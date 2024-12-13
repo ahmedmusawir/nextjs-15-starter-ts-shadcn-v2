@@ -10,23 +10,15 @@ interface Props {
 }
 
 const BlogPostItems = ({ initialPosts }: Props) => {
-  // Hydrate Zustand store on client
-  useEffect(() => {
-    if (initialPosts.length > 0) {
-      usePaginationStore.setState({
-        items: initialPosts,
-        endCursor: null, // Keep null if it's not part of the initial load
-        hasNextPage: true, // Or false, based on initial data
-      });
-    }
-  }, [initialPosts]);
-
   // Fetch items from Zustand store
   const items = usePaginationStore((state) => state.items);
 
+  // Merge initial posts with persisted ones if any
+  const postsToDisplay = items.length > 0 ? items : initialPosts;
+
   return (
     <div className="mx-auto mt-16 grid max-w-2xl auto-rows-fr grid-cols-1 gap-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-      {items.map((post: BlogPost) => (
+      {postsToDisplay.map((post: BlogPost) => (
         <article
           key={post.id}
           className="relative isolate flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-900 px-8 pb-8 pt-80 sm:pt-48 lg:pt-80"
