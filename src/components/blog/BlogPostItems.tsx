@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDateString } from "@/lib/utils";
 import { usePaginationStore } from "@/store/usePaginationStore";
 import { BlogPost } from "@/types/blog";
 import Link from "next/link";
@@ -33,7 +34,7 @@ const BlogPostItems = ({ initialPosts }: Props) => {
 
           <div className="flex flex-wrap items-center gap-y-1 overflow-hidden text-sm/6 text-gray-300">
             <time dateTime={post.date} className="mr-8">
-              {post.date}
+              {formatDateString(post.date)}
             </time>
             <div className="-ml-4 flex items-center gap-x-4">
               <svg

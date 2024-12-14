@@ -30,8 +30,7 @@ interface LoadMoreButtonProps {
 }
 
 const LoadMoreButton = ({ initialEndCursor }: LoadMoreButtonProps) => {
-  const { hasNextPage, fetchNextPage, isLoading, endCursor } =
-    usePaginationStore();
+  const { hasNextPage, fetchNextPage, isLoading } = usePaginationStore();
 
   const handleLoadMore = async () => {
     await fetchNextPage((cursor) =>
