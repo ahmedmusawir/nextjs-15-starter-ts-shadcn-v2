@@ -1,7 +1,6 @@
 import BlogPostItems from "@/components/blog/BlogPostItems";
 import LoadMoreButton from "@/components/common/LoadMoreButton";
 import { fetchBlogPosts } from "@/services/blogServices";
-import { usePaginationStore } from "@/store/usePaginationStore";
 
 const BlogPageContent = async () => {
   const {
@@ -9,14 +8,6 @@ const BlogPageContent = async () => {
     endCursor,
     hasNextPage,
   } = await fetchBlogPosts(6, null); // Fetch first 6 posts
-
-  // Initialize Zustand store with the first batch of posts
-  usePaginationStore.setState({
-    items: initialPosts, // Assigning the initialPosts value to the items var
-    endCursor,
-    hasNextPage,
-    isLoading: false,
-  });
 
   return (
     <div className="bg-white py-24 sm:py-32">
@@ -30,7 +21,11 @@ const BlogPageContent = async () => {
           </p>
         </div>
         {/* Render the posts */}
-        <BlogPostItems initialPosts={initialPosts} />
+        <BlogPostItems
+          initialPosts={initialPosts}
+          hasNextPage={hasNextPage}
+          endCursor={endCursor}
+        />
         {/* Pass props to LoadMoreButton */}
         {hasNextPage && <LoadMoreButton initialEndCursor={endCursor} />}
       </div>

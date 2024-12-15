@@ -4,15 +4,43 @@ import { formatDateString } from "@/lib/utils";
 import { usePaginationStore } from "@/store/usePaginationStore";
 import { BlogPost } from "@/types/blog";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 interface Props {
   initialPosts: BlogPost[];
+  hasNextPage: boolean;
+  endCursor: string | null;
 }
 
-const BlogPostItems = ({ initialPosts }: Props) => {
+const BlogPostItems = ({ initialPosts, endCursor, hasNextPage }: Props) => {
   // Fetch items from Zustand store
   const items = usePaginationStore((state) => state.items);
+  const hasHydrated = usePaginationStore((state) => state.hasHydrated);
+
+  // Hydrate Zustand store AFTER the component mounts
+  useEffect(() => {
+    console.log("Hydration Status Check Before Updating Store:", {
+      hasHydrated,
+      items: usePaginationStore.getState().items,
+    });
+
+    if (!hasHydrated && initialPosts.length > 0) {
+      console.log("Hydrating Zustand Store with Initial Posts:", initialPosts);
+      usePaginationStore.setState((state) => {
+        if (state.items.length === 0) {
+          return {
+            items: initialPosts,
+            endCursor,
+            hasNextPage,
+            isLoading: false,
+            hasHydrated: true, // Mark hydration complete
+          };
+        }
+        console.log("Skipped Setting Items: Zustand Store Already Updated");
+        return state; // Prevent overwriting if items already exist
+      });
+    }
+  }, [hasHydrated, initialPosts]);
 
   // Merge initial posts with persisted ones if any
   const postsToDisplay = items.length > 0 ? items : initialPosts;
