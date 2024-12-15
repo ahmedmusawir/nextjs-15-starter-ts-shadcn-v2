@@ -6,6 +6,7 @@ interface PaginationStore<T> {
   endCursor: string | null; // Cursor for the next page
   hasNextPage: boolean; // Indicator if more pages are available
   isLoading: boolean; // Loading state for UI feedback
+  hasHydrated: boolean; // Checks if the state has been hydrated or not
   fetchNextPage: (
     fetchFunction: (
       cursor: string | null
@@ -18,6 +19,7 @@ interface PaginationStore<T> {
   ) => void; // Action to manually update the store
   resetPagination: () => void; // Action to reset pagination state
   setIsLoading: (loading: boolean) => void; // Action to set loading state
+  markHydrated: () => void; // Updates the hasHydrated value
 }
 
 export const usePaginationStore = create<PaginationStore<any>>()(
@@ -27,8 +29,17 @@ export const usePaginationStore = create<PaginationStore<any>>()(
       endCursor: null,
       hasNextPage: true,
       isLoading: true, // Initially loading
+      hasHydrated: false, // Track hydration status
+
+      // Add a method to mark the store as hydrated
+      markHydrated: () => set({ hasHydrated: true }),
 
       fetchNextPage: async (fetchFunction) => {
+        console.log("Fetching Next Page...");
+        console.log(
+          "Current State Before Fetch:",
+          usePaginationStore.getState()
+        );
         set({ isLoading: true });
 
         try {
@@ -36,12 +47,19 @@ export const usePaginationStore = create<PaginationStore<any>>()(
             usePaginationStore.getState().endCursor
           );
 
+          console.log("Fetched Data:", items);
+
           set((state) => ({
             items: [...state.items, ...items],
             endCursor,
             hasNextPage,
             isLoading: false,
           }));
+
+          console.log(
+            "Updated State After Fetch:",
+            usePaginationStore.getState()
+          );
         } catch (error) {
           console.error("Error fetching next page:", error);
           set({ isLoading: false });
@@ -69,12 +87,20 @@ export const usePaginationStore = create<PaginationStore<any>>()(
     {
       name: "pagination-store", // LocalStorage key
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        items: state.items,
-        endCursor: state.endCursor,
-        hasNextPage: state.hasNextPage,
-      }),
+      partialize: (state) => {
+        console.log("Partializing State:", state.items);
+        return {
+          items: state.items,
+          endCursor: state.endCursor,
+          hasNextPage: state.hasNextPage,
+        };
+      },
       onRehydrateStorage: () => (state) => {
+        console.log(
+          "Hydration Triggered: Zustand Store",
+          state?.items || "No Items"
+        );
+        console.log("Rehydrated State:", state?.items); // Log state after hydration
         state?.setIsLoading(false); // Hydration is complete
       },
     }
