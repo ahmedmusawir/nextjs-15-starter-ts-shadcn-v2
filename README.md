@@ -16,4 +16,4 @@
 
 ## The Load More Button Architecture w/ Zustand Store
 
-![Headless WooCommerce with Blog and Load More using Zustand](https://res.cloudinary.com/dyb0qa58h/image/upload/v1734225823/HEADLESS_WOOCOM_-_BLOG_LOAD_MORE_W__ZUSTAND_ygfmhx.png)
+![Headless WooCommerce with Blog and Load More using Zustand](https://res.cloudinary.com/dyb0qa58h/image/upload/v1734315857/HEADLESS_WOOCOM_-_BLOG_LOAD_MORE_W__ZUSTAND_opxozz.png)
